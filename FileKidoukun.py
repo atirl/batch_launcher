@@ -8,6 +8,7 @@
 import os
 import sys
 import subprocess
+import getpass
 import tkinter as tk
 from tkinter import messagebox, filedialog
 from datetime import datetime
@@ -57,16 +58,29 @@ TARGET_DIRECTORIES = [DEFAULT_TARGET_DIRECTORY]
 
 
 #============================================================
-# 関数
+# ログ用関数
 #============================================================
+"""ユーザー名を取得"""
+def get_log_user_name():
+    user_name = getpass.getuser()
+    domain_name = os.environ.get("USERDOMAIN", "")
+
+    if not domain_name:
+        domain_name = os.environ.get("COMPUTERNAME", "")
+
+    if domain_name:
+        return f"{domain_name}\\{user_name}"
+
+    return user_name
+
 """ログ書き込み"""
 def write_log(message):
-
     now = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    user_name = get_log_user_name()
 
     try:
         with open(LOG_FILE_PATH, "a", encoding="utf-8") as f:
-            f.write(f"{now}  {message}\n")
+            f.write(f"{now}  [{user_name}] {message}\n")
     except Exception:
         pass
 
